@@ -10,6 +10,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class SickleFlintItem extends Item {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public @NotNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
         if(SICKLE_MAP.containsKey(clickedBlock)){
@@ -33,7 +34,10 @@ public class SickleFlintItem extends Item {
                 level.setBlockAndUpdate(context.getClickedPos(), SICKLE_MAP.get(clickedBlock).defaultBlockState());
 
                 context.getItemInHand().hurtAndBreak(1, ((ServerLevel) level), context.getPlayer(),
-                        item -> context.getPlayer().onEquippedItemBroken(item, EquipmentSlot.MAINHAND));
+                        item -> {
+                            assert context.getPlayer() != null;
+                            context.getPlayer().onEquippedItemBroken(item, EquipmentSlot.MAINHAND);
+                        });
 
                 level.playSound(null, context.getClickedPos(), SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F );
             }
